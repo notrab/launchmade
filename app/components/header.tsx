@@ -17,7 +17,7 @@ export function Header({ stripeEnabled }: { stripeEnabled: boolean }) {
         <div className="container mx-auto flex h-14 items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <Link to="/" className="text-lg font-semibold">
-              Quickburrow
+              LaunchMade
             </Link>
             {session && (
               <>

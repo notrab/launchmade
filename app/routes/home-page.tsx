@@ -5,8 +5,8 @@ import type { Route } from "./+types/home-page";
 
 export function meta() {
   return [
-    { title: "Quickburrow" },
-    { name: "description", content: "Welcome to Quickburrow" },
+    { title: "LaunchMade" },
+    { name: "description", content: "Welcome to LaunchMade" },
   ];
 }
 

@@ -1,5 +1,5 @@
 /**
- * Central configuration for the Quickburrow SaaS boilerplate.
+ * Central configuration for the LaunchMade SaaS boilerplate.
  *
  * Edit this file to customize your app's branding, features, and defaults.
  * Environment variables are still used for secrets and deployment-specific
@@ -12,7 +12,7 @@ type OrgRole = InferOrganizationRolesFromOption<undefined>;
 
 export const config = {
   /** App name used in emails, passkey prompts, 2FA issuer, and meta tags */
-  name: "Quickburrow",
+  name: "LaunchMade",
 
   /** Default "from" address for transactional emails */
   emailFrom: "noreply@yourdomain.com",

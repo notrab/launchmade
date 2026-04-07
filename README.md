@@ -1,50 +1,49 @@
-# Welcome to React Router!
+# LaunchMade
 
-A modern, production-ready template for building full-stack React applications using React Router.
+A launch-ready SaaS boilerplate built with React Router, Better Auth, Drizzle ORM, and Stripe. Auth, billing, teams, emails, and more — already wired up so you can focus on your product.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+## What's included
 
-## Features
+- **Auth** — email/password, OAuth, passkeys, 2FA, SSO, session management
+- **Organizations** — workspaces with roles (owner/admin/member), teams, invitations
+- **Billing** — Stripe subscriptions, checkout, invoices, promo codes, free trials
+- **Emails** — React Email templates sent via Resend (11 templates included)
+- **Notifications** — in-app (real-time SSE) + email, with user preferences
+- **RBAC** — role-based route protection with helper utilities
+- **Audit logging** — track user actions across workspaces
+- **File uploads** — Bunny Storage or local filesystem
+- **Security** — rate limiting, CSRF, encrypted OAuth tokens, password breach checking
+- **Deployment** — Docker + GitHub Actions for Bunny Magic Containers
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
-
-## Getting Started
-
-### Installation
-
-Install the dependencies:
+## Quick start
 
 ```bash
 npm install
+npm run db:push       # create database tables
+npm run db:seed       # seed with sample data (optional)
+npm run dev           # start dev server at http://localhost:5173
 ```
 
-### Development
+Test accounts (password: `password123`): `alice@example.com`, `bob@example.com`, `charlie@example.com`, `diana@example.com`, `eve@example.com`
 
-Start the development server with HMR:
+## Tech stack
 
-```bash
-npm run dev
-```
+| Layer | Technology |
+|---|---|
+| Framework | [React Router 7](https://reactrouter.com/) (SSR) |
+| Auth | [Better Auth](https://www.better-auth.com/) |
+| Database | [Drizzle ORM](https://orm.drizzle.team/) + SQLite / [Bunny Database](https://bunny.net/database/) |
+| Storage | [Bunny Storage](https://bunny.net/storage/) (falls back to local filesystem) |
+| Billing | [Stripe](https://stripe.com/) via `@better-auth/stripe` |
+| Emails | [React Email](https://react.email/) + [Resend](https://resend.com/) |
+| Styling | [Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) |
+| Language | TypeScript (strict mode) |
 
-Your application will be available at `http://localhost:5173`.
-
-## Building for Production
-
-Create a production build:
-
-```bash
-npm run build
-```
+---
 
 ## Authentication
 
-Authentication is powered by [Better Auth](https://www.better-auth.com/). The server config lives in `app/lib/auth.server.ts` and the client in `app/lib/auth-client.ts`.
+Powered by [Better Auth](https://www.better-auth.com/). Server config: `app/lib/auth.server.ts`. Client config: `app/lib/auth-client.ts`.
 
 ### Included out of the box
 
@@ -73,52 +72,53 @@ Authentication is powered by [Better Auth](https://www.better-auth.com/). The se
 
 Better Auth is plugin-based — add to `app/lib/auth.server.ts` (server) and `app/lib/auth-client.ts` (client), then run `npx @better-auth/cli generate` if the plugin adds new tables. See the [Better Auth plugins docs](https://www.better-auth.com/docs/plugins) for available plugins.
 
+---
+
 ## Billing
 
-Billing is powered by [Stripe](https://stripe.com/) via the [`@better-auth/stripe`](https://www.better-auth.com/docs/plugins/stripe) plugin. It's entirely opt-in — billing features are disabled when `STRIPE_SECRET_KEY` is not set.
+Powered by [Stripe](https://stripe.com/) via [`@better-auth/stripe`](https://www.better-auth.com/docs/plugins/stripe). Entirely opt-in — disabled when `STRIPE_SECRET_KEY` is not set.
 
 Set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and `STRIPE_PRO_PRICE_ID` to activate.
 
-### What's included
+### Features
 
 - **Stripe Checkout** — upgrade to Pro via hosted checkout with promotion code support
 - **Subscription management** — cancel, resubscribe, and view subscription status
-- **Plan details** — displays current plan, price, billing interval, and next billing date
-- **Invoice history** — list past invoices with links to hosted receipts and PDF downloads
+- **Plan details** — current plan, price, billing interval, and next billing date
+- **Invoice history** — past invoices with hosted receipts and PDF downloads
 - **Billing email** — manage the email address Stripe sends receipts to
 - **Subscription sync** — sync local subscription state with Stripe on demand
 - **Role-gated** — only workspace owners and admins can manage billing
 - **Per-organization** — subscriptions are tied to workspaces, not individual users
 
-The billing UI lives in `app/components/workspace-settings-dialog/billing-tab.tsx`. Billing API routes are in `app/routes/api.billing.ts`.
+The billing UI lives in `app/components/workspace-settings-dialog/billing-tab.tsx`. API routes in `app/routes/api.billing.ts`.
 
 ### Webhooks
 
-Stripe webhooks are handled automatically through the Better Auth catch-all route at `/api/auth/stripe/webhook`. The plugin processes `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, and `customer.subscription.deleted` events.
+Handled automatically through the Better Auth catch-all route at `/api/auth/stripe/webhook`. Processes `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, and `customer.subscription.deleted`.
 
-**Local development:** Use the [Stripe CLI](https://stripe.com/docs/stripe-cli) to forward webhook events to your dev server:
+**Local development:** Use the [Stripe CLI](https://stripe.com/docs/stripe-cli) to forward events:
 
 ```bash
 stripe listen --forward-to http://localhost:5173/api/auth/stripe/webhook
 ```
 
-The CLI will output a webhook signing secret (`whsec_...`) — set that as `STRIPE_WEBHOOK_SECRET` in your `.env`.
+Set the output secret (`whsec_...`) as `STRIPE_WEBHOOK_SECRET` in your `.env`.
 
-**Production:** Create a webhook endpoint in the [Stripe Dashboard](https://dashboard.stripe.com/webhooks) pointing to `https://yourdomain.com/api/auth/stripe/webhook` and set the signing secret as `STRIPE_WEBHOOK_SECRET`.
+**Production:** Create a webhook endpoint in the [Stripe Dashboard](https://dashboard.stripe.com/webhooks) pointing to `https://yourdomain.com/api/auth/stripe/webhook`.
 
 ### Promotion codes
 
-Promotion codes are enabled on the Stripe Checkout page by default. To create one:
+Enabled on checkout by default. Create them in the [Stripe Dashboard](https://dashboard.stripe.com/coupons):
 
-1. Go to **Products > Coupons** in the [Stripe Dashboard](https://dashboard.stripe.com/coupons)
-2. Create a coupon (e.g. 20% off for 3 months)
-3. Generate a promotion code for the coupon (e.g. `LAUNCH20`)
+1. Create a coupon (e.g. 20% off for 3 months)
+2. Generate a promotion code (e.g. `LAUNCH20`)
 
-Customers can enter the code during checkout. Stripe handles validation and discount application.
+Customers enter the code during checkout — Stripe handles the rest.
 
 ### Free trials
 
-Free trials are supported per-plan via the `freeTrial` option in the Stripe plugin config in `app/lib/auth.server.ts`:
+Supported per-plan via the `freeTrial` option in `app/lib/auth.server.ts`:
 
 ```ts
 plans: [
@@ -135,17 +135,19 @@ plans: [
 ],
 ```
 
-The plugin automatically passes `trial_period_days` to Stripe Checkout, tracks `trialStart`/`trialEnd` in the database, and prevents the same organization from receiving a trial twice.
+Automatically passes `trial_period_days` to checkout, tracks trial dates in the database, and prevents repeat trials per organization.
 
 ### Adding plans
 
-A single `pro` plan is configured by default. To add more plans, create a price in your Stripe dashboard and add it to the plugin config in `app/lib/auth.server.ts`.
+A single `pro` plan is configured by default. To add more, create a price in your Stripe dashboard and add it to the plugin config in `app/lib/auth.server.ts`.
+
+---
 
 ## Emails
 
-Transactional emails are built with [React Email](https://react.email/) and sent via [Resend](https://resend.com/). Set `RESEND_API_KEY` to activate — without it, emails are logged to the console.
+Built with [React Email](https://react.email/) and sent via [Resend](https://resend.com/). Set `RESEND_API_KEY` to activate — without it, emails are logged to the console.
 
-Templates live in `app/emails/` and share a common layout (`app/emails/components/layout.tsx`) for consistent branding and styling.
+Templates live in `app/emails/` and share a common layout (`app/emails/components/layout.tsx`).
 
 ### Templates
 
@@ -163,47 +165,101 @@ Templates live in `app/emails/` and share a common layout (`app/emails/component
 | `subscription-cancelled.tsx` | Subscription cancellation confirmation |
 | `notification.tsx` | Generic notification forwarded via email |
 
-### Preview
-
-Run the React Email dev server to preview and edit templates in the browser:
+### Preview and customize
 
 ```bash
 npm run email:dev
 ```
 
-### Customization
+All templates import shared styles from `app/emails/components/layout.tsx`. Update the layout to change branding across all emails.
 
-All templates import shared styles from `app/emails/components/layout.tsx`. Update the layout to change the logo, footer, colors, or font across all emails. Per-template changes are made directly in the template file.
+---
 
-## Environment Variables
+## Notifications
 
-| Variable | Required | Description |
-|---|---|---|
-| `BUNNY_DATABASE_URL` | No | Bunny Database / libSQL connection URL. Falls back to `file:dev.db` for local development |
-| `BUNNY_DATABASE_AUTH_TOKEN` | No | Auth token for Bunny Database / libSQL remote connections |
-| `BETTER_AUTH_URL` | Yes | Base URL of your app (e.g. `https://app.example.com`) |
-| `BETTER_AUTH_SECRET` | Yes | Auth secret (min 32 chars). Generate with `openssl rand -base64 32` |
-| `GOOGLE_CLIENT_ID` | No | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | No | Google OAuth client secret |
-| `RESEND_API_KEY` | No | Resend API key for sending emails. Logs to console if not set |
-| `RESEND_WEBHOOK_SECRET` | No | Resend webhook signing secret for delivery tracking |
-| `STRIPE_SECRET_KEY` | No | Stripe secret key. Billing features disabled if not set |
-| `STRIPE_WEBHOOK_SECRET` | No | Stripe webhook signing secret |
-| `STRIPE_PRO_PRICE_ID` | No | Stripe price ID for the Pro plan |
-| `BUNNY_API_KEY` | No | BunnyCDN API key for file uploads. Falls back to local filesystem |
-| `BUNNY_STORAGE_ZONE` | No | BunnyCDN storage zone name |
-| `BUNNY_CDN_URL` | No | BunnyCDN CDN URL |
-| `REDIS_URL` | No | Redis connection URL for rate limiting. Falls back to database storage |
+Real-time in-app notifications via Server-Sent Events (SSE), with optional email forwarding. Users control their preferences (in-app, email, or both) from the Notifications tab in account settings.
+
+### Sending notifications
+
+From server-side code (e.g. route actions, hooks, scripts):
+
+```ts
+import { sendNotification } from "~/lib/plugins/notification";
+
+await sendNotification({
+  userId: "user_id",
+  organizationId: "org_id", // optional
+  type: "member.joined",
+  title: "Alice joined the workspace",
+  body: "Alice was added as a member.",
+  link: "/acme/settings?tab=members",
+});
+```
+
+The function checks the user's notification preferences — if in-app is enabled, it stores the notification and pushes it via SSE. If email is enabled, it sends a formatted email using the `notification.tsx` template.
+
+From client-side code (e.g. within `clientAction`):
+
+```ts
+await authClient.notification.sendNotification({
+  email: "user@example.com", // resolves to userId
+  type: "invitation.received",
+  title: "You've been invited",
+});
+```
+
+### Delivery tracking
+
+Resend webhook events (delivered, bounced, complained) are captured at `/api/webhooks/resend` and logged to the `email_log` table. Set `RESEND_WEBHOOK_SECRET` and point your Resend webhook to `https://yourdomain.com/api/webhooks/resend`.
+
+---
+
+## File Uploads
+
+File uploads support [Bunny Storage](https://bunny.net/storage/) in production and local filesystem in development. The upload utility is in `app/lib/upload.server.ts`.
+
+```ts
+import { uploadFile } from "~/lib/upload.server";
+
+const url = await uploadFile(file); // Returns the public URL
+```
+
+When `BUNNY_API_KEY` is set, files are uploaded to Bunny Storage and served via CDN. Without it, files are saved to `public/uploads/` locally. Files are given random UUID names to prevent collisions.
+
+Set `BUNNY_API_KEY`, `BUNNY_STORAGE_ZONE`, and `BUNNY_CDN_URL` to activate cloud storage.
+
+---
+
+## Audit Logging
+
+Workspace actions are logged to the `audit_log` table and viewable in workspace settings under the Audit Log tab.
+
+### Adding custom audit events
+
+```ts
+import { logAudit } from "~/lib/audit.server";
+
+await logAudit({
+  organizationId: "org_id",
+  actorId: "user_id",
+  action: "document.created",
+  targetType: "document",
+  targetId: "doc_id",
+  metadata: { title: "My Document" },
+});
+```
+
+### Tracked automatically
+
+Session creation and OAuth account linking are logged via Better Auth database hooks. Workspace-level events (member invited, role changed, member removed, billing updated, workspace deleted) are logged from their respective route actions.
+
+---
 
 ## Database
 
-The database layer uses [Drizzle ORM](https://orm.drizzle.team/) with SQLite/libSQL. See the [Drizzle docs](https://orm.drizzle.team/docs/overview) for schema definitions, queries, and migrations.
+Uses [Drizzle ORM](https://orm.drizzle.team/) with SQLite/libSQL.
 
-In local development, a SQLite file (`dev.db`) is used automatically — no setup needed.
-
-In production, create a [Bunny Database](https://bunny.net/database/) and set `BUNNY_DATABASE_URL` and `BUNNY_DATABASE_AUTH_TOKEN`. Bunny Database is libSQL-compatible (like Turso), so Drizzle connects to it natively.
-
-### Commands
+Locally, a SQLite file (`dev.db`) is used automatically — no setup needed. In production, create a [Bunny Database](https://bunny.net/database/) and set `BUNNY_DATABASE_URL` and `BUNNY_DATABASE_AUTH_TOKEN`.
 
 | Command | Description |
 |---|---|
@@ -213,13 +269,17 @@ In production, create a [Bunny Database](https://bunny.net/database/) and set `B
 | `npm run db:studio` | Open Drizzle Studio to browse your data |
 | `npm run db:seed` | Seed the database with sample data |
 
-For local development, `db:push` is the fastest way to iterate. For production, use `db:generate` followed by `db:migrate` so migrations are versioned and reviewable in git.
+For local dev, `db:push` is fastest. For production, use `db:generate` then `db:migrate` so migrations are versioned and reviewable in git.
+
+---
 
 ## Rate Limiting
 
-Rate limiting is enabled by default on all auth endpoints. Stricter limits apply to sensitive routes like sign-in (5 req/min), sign-up (3 req/min), and password reset (3 req/min).
+Enabled by default on all auth endpoints. Stricter limits on sensitive routes: sign-in (5 req/min), sign-up (3 req/min), password reset (3 req/min).
 
-**Storage:** When `REDIS_URL` is set, rate limit counters are stored in Redis via Better Auth's secondary storage. This is recommended for production deployments with multiple instances. Without `REDIS_URL`, counters are stored in the database — fine for single-instance deployments and local development.
+When `REDIS_URL` is set, counters are stored in Redis (recommended for multi-instance deployments). Without it, counters are stored in the database.
+
+---
 
 ## Route Guides
 
@@ -375,21 +435,45 @@ The index route (`/`) shows the marketing page for unauthenticated users and red
 See `app/routes/home.tsx` and `app/routes/home-page.tsx`.
 </details>
 
+---
+
 ## Scheduled Cleanup
 
 A cleanup script removes stale data: expired invite links, expired verification tokens, expired sessions, and unverified accounts older than 7 days.
-
-Run it manually:
 
 ```bash
 npm run cleanup
 ```
 
-Or schedule it as a cron job (e.g. every hour):
+Or schedule as a cron job (e.g. every hour):
 
 ```
 0 * * * * cd /app && npx tsx scripts/cleanup.ts
 ```
+
+---
+
+## Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `BUNNY_DATABASE_URL` | No | Bunny Database / libSQL connection URL. Falls back to `file:dev.db` for local development |
+| `BUNNY_DATABASE_AUTH_TOKEN` | No | Auth token for Bunny Database / libSQL remote connections |
+| `BETTER_AUTH_URL` | Yes | Base URL of your app (e.g. `https://app.example.com`) |
+| `BETTER_AUTH_SECRET` | Yes | Auth secret (min 32 chars). Generate with `openssl rand -base64 32` |
+| `GOOGLE_CLIENT_ID` | No | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | No | Google OAuth client secret |
+| `RESEND_API_KEY` | No | Resend API key for sending emails. Logs to console if not set |
+| `RESEND_WEBHOOK_SECRET` | No | Resend webhook signing secret for delivery tracking |
+| `STRIPE_SECRET_KEY` | No | Stripe secret key. Billing features disabled if not set |
+| `STRIPE_WEBHOOK_SECRET` | No | Stripe webhook signing secret |
+| `STRIPE_PRO_PRICE_ID` | No | Stripe price ID for the Pro plan |
+| `BUNNY_API_KEY` | No | BunnyCDN API key for file uploads. Falls back to local filesystem |
+| `BUNNY_STORAGE_ZONE` | No | BunnyCDN storage zone name |
+| `BUNNY_CDN_URL` | No | BunnyCDN CDN URL |
+| `REDIS_URL` | No | Redis connection URL for rate limiting. Falls back to database storage |
+
+---
 
 ## Deployment
 
@@ -416,20 +500,16 @@ A GitHub Actions workflow is included at `.github/workflows/deploy.yml` that bui
 
 ### Docker (other platforms)
 
-To build and run locally or deploy to any Docker-compatible platform:
-
 ```bash
-docker build -t quickburrow .
-docker run -p 3000:3000 quickburrow
+docker build -t launchmade .
+docker run -p 3000:3000 launchmade
 ```
 
 Works with AWS ECS, Google Cloud Run, Azure Container Apps, Digital Ocean App Platform, Fly.io, Railway, etc.
 
-### DIY Deployment
+### DIY
 
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
+Deploy the output of `npm run build`:
 
 ```
 ├── package.json
@@ -439,10 +519,20 @@ Make sure to deploy the output of `npm run build`
 │   └── server/    # Server-side code
 ```
 
+---
+
 ## Styling
 
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
+[Tailwind CSS v4](https://tailwindcss.com/) with [shadcn/ui](https://ui.shadcn.com/) components. Colors are defined as `oklch()` CSS variables in `app/app.css`.
+
+Add new shadcn components:
+
+```bash
+npx shadcn@latest add <component>
+```
 
 ---
 
-Built with ❤️ using React Router.
+## Configuration
+
+App-level settings like branding, session durations, rate limits, and invite link defaults live in `app/lib/config.ts`. Environment variables are used for secrets and deployment-specific values.

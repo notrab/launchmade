@@ -24,7 +24,7 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
         <Container style={container}>
           <Section style={content}>{children}</Section>
           <Hr style={hr} />
-          <Text style={footer}>Quickburrow</Text>
+          <Text style={footer}>LaunchMade</Text>
         </Container>
       </Body>
     </Html>

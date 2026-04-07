@@ -127,7 +127,7 @@ function WorkspaceTypeStep({
   return (
     <div className="flex flex-col gap-5">
       <div className="text-center">
-        <h2 className="text-lg font-semibold">How will you use Quickburrow?</h2>
+        <h2 className="text-lg font-semibold">How will you use LaunchMade?</h2>
         <p className="text-muted-foreground mt-1 text-sm">
           You can always change this later
         </p>

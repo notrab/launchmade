@@ -9,8 +9,8 @@ interface WelcomeProps {
 
 export default function Welcome({ name, url }: WelcomeProps) {
   return (
-    <EmailLayout preview={`Welcome to Quickburrow, ${name}`}>
-      <Heading style={styles.heading}>Welcome to Quickburrow</Heading>
+    <EmailLayout preview={`Welcome to LaunchMade, ${name}`}>
+      <Heading style={styles.heading}>Welcome to LaunchMade</Heading>
       <Text style={styles.paragraph}>Hi {name},</Text>
       <Text style={styles.paragraph}>
         Thanks for signing up. Your account is ready to go.
